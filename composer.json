@@ -13,6 +13,7 @@
       "ParagonIE\\HPKE\\": "src"
     }
   },
+  "license": "ISC",
   "autoload-dev": {
     "psr-4": {
       "ParagonIE\\HPKE\\Tests\\": "tests"
