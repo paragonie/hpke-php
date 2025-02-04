@@ -23,8 +23,9 @@ jobs:
 
       - name: Install Composer dependencies
         uses: "ramsey/composer-install@v2"
-        with:
-          composer-options: --no-dev
+
+      - name: Force Psalm
+        run: composer require --dev vimeo/psalm
 
       - name: Static Analysis
         run: psalm
