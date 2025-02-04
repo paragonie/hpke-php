@@ -1,0 +1,33 @@
+{
+  "name": "paragonie/hpke",
+  "description": "Hybrid Public-Key Encryption (RFC 9180) for PHP",
+  "authors": [
+    {
+      "name": "Paragon Initiative Enterprises",
+      "email": "security@paragonie.com",
+      "homepage": "https://paragonie.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "ParagonIE\\HPKE\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ParagonIE\\HPKE\\Tests\\": "tests"
+    }
+  },
+  "require": {
+    "php": "^8.2",
+    "ext-gmp": "*",
+    "ext-openssl": "*",
+    "paragonie/sodium_compat": "^2",
+    "paragonie/easy-ecc": "^1",
+    "paragonie/ecc": "^2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10",
+    "vimeo/psalm": "^5"
+  }
+}
