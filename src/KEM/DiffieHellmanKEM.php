@@ -38,6 +38,47 @@ class DiffieHellmanKEM implements KemInterface
     ) {}
 
     /**
+     * This is called Npk in the HPKE spec..
+     *
+     * @return int
+     */
+    public function getPublicKeyLength(): int
+    {
+        return match ($this->curve) {
+            Curve::Secp256k1, Curve::NistP256 => 65,
+            Curve::NistP384 => 97,
+            Curve::NistP521 => 133,
+            Curve::X25519 => 32
+        };
+    }
+
+    /**
+     * Thisi s called Nsec in the HPKE spec.
+     */
+    public function getSecretLength(): int
+    {
+        return match ($this->curve) {
+            Curve::Secp256k1, Curve::NistP256, Curve::X25519 => 32,
+            Curve::NistP384 => 48,
+            Curve::NistP521 => 64
+        };
+    }
+
+    /**
+     * Thisi s called Nsk in the HPKE spec.
+     */
+    public function getSecretKeyLength(): int
+    {
+        return match ($this->curve) {
+            Curve::Secp256k1, Curve::NistP256, Curve::X25519 => 32,
+            Curve::NistP384 => 48,
+            Curve::NistP521 => 66
+        };
+    }
+
+    /**
+     * This is called Nenc in the HPKE spec.
+     *
      * @return int
      */
     public function getHeaderLength(): int
@@ -137,7 +178,7 @@ class DiffieHellmanKEM implements KemInterface
         $dh = $this->scalarMult($ephSecret, $encapsKey);
         $enc = $ephPublic->serializeForHeader();
         $kem_context = $enc . $encapsKey->serializeForHeader();
-        $secret_length = $this->curve->secretLength();
+        $secret_length = $this->getSecretLength();
         $shared_secret = new SymmetricKey(
             $this->kdf->extractAndExpand(
                 suiteId: $this->getSuiteId(),
@@ -171,7 +212,7 @@ class DiffieHellmanKEM implements KemInterface
         $ephPublic = new EncapsKey($decapsKey->curve, $enc);
         $dh = $this->scalarMult($decapsKey, $ephPublic);
         $kem_context = $enc . $decapsKey->getEncapsKey()->bytes;
-        $secret_length = $this->curve->secretLength();
+        $secret_length = $this->getSecretLength();
         return new SymmetricKey(
             $this->kdf->extractAndExpand($this->getSuiteId(), $dh, $kem_context, $secret_length)
         );

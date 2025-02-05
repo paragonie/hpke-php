@@ -10,6 +10,12 @@ interface KemInterface
 
     public function getKemId(): string;
 
+    public function getPublicKeyLength(): int;
+
+    public function getSecretLength(): int;
+
+    public function getSecretKeyLength(): int;
+
     public function encapsulate(
         EncapsKeyInterface $encapsKey
     ): array;

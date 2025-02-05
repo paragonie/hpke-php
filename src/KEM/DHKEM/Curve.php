@@ -28,15 +28,6 @@ enum Curve : string
         };
     }
 
-    public function secretLength(): int
-    {
-        return match($this) {
-            self::X25519, self::Secp256k1, self::NistP256 => 32,
-            self::NistP384 => 48,
-            self::NistP521 => 64,
-        };
-    }
-
     public function encapsKeyLength(): int
     {
         return match($this) {
