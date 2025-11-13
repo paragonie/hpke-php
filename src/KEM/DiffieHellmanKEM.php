@@ -98,6 +98,11 @@ class DiffieHellmanKEM implements KemInterface
         };
     }
 
+    public function getSuiteName(): string
+    {
+        return 'DHKEM(' . $this->curve->getSuiteName() . ', ' . $this->kdf->getSuiteName() . ')';
+    }
+
     /**
      * This is different from the HPKE Suite ID
      *

@@ -7,6 +7,7 @@ use ParagonIE\HPKE\SymmetricKey;
 interface AEADInterface
 {
     public function getAeadId(): string;
+    public function getSuiteName(): string;
     public function keyLength(): int;
     public function nonceLength(): int;
     public function tagLength(): int;

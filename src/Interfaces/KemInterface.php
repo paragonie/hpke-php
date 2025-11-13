@@ -9,6 +9,7 @@ interface KemInterface
     public function getHeaderLength(): int;
 
     public function getKemId(): string;
+    public function getSuiteName(): string;
 
     public function getPublicKeyLength(): int;
 

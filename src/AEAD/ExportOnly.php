@@ -18,6 +18,11 @@ class ExportOnly implements AEADInterface
         return self::AEAD_ID;
     }
 
+    public function getSuiteName(): string
+    {
+        return 'Export-Only AEAD';
+    }
+
     /**
      * @throws HPKEException
      */

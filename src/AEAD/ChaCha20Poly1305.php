@@ -16,6 +16,11 @@ class ChaCha20Poly1305 implements AEADInterface
         return self::AEAD_ID;
     }
 
+    public function getSuiteName(): string
+    {
+        return 'ChaCha20Poly1305';
+    }
+
     public function keyLength(): int
     {
         return 32;
