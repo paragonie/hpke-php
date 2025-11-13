@@ -16,6 +16,11 @@ class AES128GCM implements AEADInterface
         return self::AEAD_ID;
     }
 
+    public function getSuiteName(): string
+    {
+        return 'AES-128-GCM';
+    }
+
     public function keyLength(): int
     {
         return 16;

@@ -14,6 +14,10 @@ class AES256GCM implements AEADInterface
     {
         return self::AEAD_ID;
     }
+    public function getSuiteName(): string
+    {
+        return 'AES-256-GCM';
+    }
 
     public function keyLength(): int
     {

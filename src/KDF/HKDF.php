@@ -37,6 +37,11 @@ class HKDF implements KDFInterface
         };
     }
 
+    public function getSuiteName(): string
+    {
+        return 'HKDF-' . $this->hash->getSuiteName();
+    }
+
     public function deriveBytes(
         #[\SensitiveParameter]
         string|SymmetricKeyInterface $ikm,

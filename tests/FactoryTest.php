@@ -70,5 +70,6 @@ class FactoryTest extends TestCase
             sodium_bin2hex($expect->getSuiteId()),
             sodium_bin2hex($hpke->getSuiteId())
         );
+        $this->assertSame($suiteName, $hpke->getSuiteName());
     }
 }

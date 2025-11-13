@@ -83,4 +83,15 @@ enum Curve : string
                 SecureCurveFactory::getGeneratorByName(NistCurve::NAME_P521),
         };
     }
+
+    public function getSuiteName(): string
+    {
+        return match($this) {
+            self::X25519 => 'X25519',
+            self::Secp256k1 => 'secp256k1',
+            self::NistP256 => 'P-256',
+            self::NistP384 => 'P-384',
+            self::NistP521 => 'P-521',
+        };
+    }
 }

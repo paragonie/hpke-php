@@ -5,6 +5,7 @@ namespace ParagonIE\HPKE\Interfaces;
 interface KDFInterface
 {
     public function getKdfId(): string;
+    public function getSuiteName(): string;
     public function getHashLength(): int;
 
     public function deriveBytes(

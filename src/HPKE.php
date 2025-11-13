@@ -31,6 +31,20 @@ class HPKE
     ) {}
 
     /**
+     * Human-readable suite name.
+     *
+     * @return string
+     */
+    public function getSuiteName(): string
+    {
+        return implode(', ', [
+            $this->kem->getSuiteName(),
+            $this->kdf->getSuiteName(),
+            $this->aead->getSuiteName(),
+        ]);
+    }
+
+    /**
      * @return string
      */
     public function getSuiteId(): string
