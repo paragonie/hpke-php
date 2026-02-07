@@ -2,6 +2,10 @@
 declare(strict_types=1);
 namespace ParagonIE\HPKE\Tests\Context;
 
+use ParagonIE\HPKE\AEAD\AES128GCM;
+use ParagonIE\HPKE\AEAD\AES256GCM;
+use ParagonIE\HPKE\AEAD\ChaCha20Poly1305;
+use ParagonIE\HPKE\Context;
 use ParagonIE\HPKE\Context\Receiver;
 use ParagonIE\HPKE\HPKE;
 use ParagonIE\HPKE\HPKEException;
@@ -12,6 +16,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use SodiumException;
 
 #[CoversClass(Receiver::class)]
+#[CoversClass(Context::class)]
+#[CoversClass(AES128GCM::class)]
+#[CoversClass(AES256GCM::class)]
+#[CoversClass(ChaCha20Poly1305::class)]
 class ReceiverTest extends ContextTestCase
 {
     public static function makeContext(

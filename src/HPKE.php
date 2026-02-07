@@ -246,7 +246,7 @@ class HPKE
         string                                   $info = ''
     ): Receiver {
         $shared_secret = $this->kem->withHPKE($this)->authDecaps($sk, $pk, $enc);
-        $recv = $this->keySchedule(Role::Receiver, Mode::Auth, $shared_secret, $info, $psk, $pskID);
+        $recv = $this->keySchedule(Role::Receiver, Mode::AuthPSK, $shared_secret, $info, $psk, $pskID);
         if (!$recv instanceof Receiver) {
             throw new TypeError();
         }

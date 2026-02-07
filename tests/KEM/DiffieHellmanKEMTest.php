@@ -17,14 +17,25 @@ use ParagonIE\HPKE\Interfaces\AEADInterface;
 use ParagonIE\HPKE\Interfaces\KDFInterface;
 use ParagonIE\HPKE\KDF\HKDF;
 use ParagonIE\HPKE\KEM\DHKEM\Curve;
+use ParagonIE\HPKE\KEM\DHKEM\DecapsKey;
 use ParagonIE\HPKE\KEM\DHKEM\EncapsKey;
 use ParagonIE\HPKE\KEM\DiffieHellmanKEM;
+use ParagonIE\HPKE\SymmetricKey;
+use ParagonIE\HPKE\Util;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SodiumException;
 
 #[CoversClass(DiffieHellmanKEM::class)]
+#[CoversClass(HPKE::class)]
+#[CoversClass(AES256GCM::class)]
+#[CoversClass(HKDF::class)]
+#[CoversClass(Curve::class)]
+#[CoversClass(DecapsKey::class)]
+#[CoversClass(EncapsKey::class)]
+#[CoversClass(SymmetricKey::class)]
+#[CoversClass(Util::class)]
 class DiffieHellmanKEMTest extends TestCase
 {
     public static function rfc9180provider(): array

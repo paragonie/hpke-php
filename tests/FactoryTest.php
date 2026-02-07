@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace ParagonIE\HPKE\Tests;
 
+use ParagonIE\HPKE\AEAD\ExportOnly;
 use ParagonIE\HPKE\Factory;
+use ParagonIE\HPKE\Hash;
 use ParagonIE\HPKE\HPKE;
 use ParagonIE\HPKE\HPKEException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -11,6 +13,12 @@ use PHPUnit\Framework\TestCase;
 use SodiumException;
 
 #[CoversClass(Factory::class)]
+#[CoversClass(ExportOnly::class)]
+#[CoversClass(HPKE::class)]
+#[CoversClass(Hash::class)]
+#[CoversClass(HKDF::class)]
+#[CoversClass(Curve::class)]
+#[CoversClass(DiffieHellmanKEM::class)]
 class FactoryTest extends TestCase
 {
     public static function factoryProvider(): array

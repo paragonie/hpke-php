@@ -250,7 +250,7 @@ class DiffieHellmanKEM implements KemInterface
         $kem_context = $enc .
             $encapsKey->serializeForHeader() .
             $decapsKey->getEncapsKey()->serializeForHeader();
-        $secret_length = $this->curve->secretLength();
+        $secret_length = $this->getSecretLength();
         $shared_secret = new SymmetricKey($this->kdf->extractAndExpand(
             $this->getSuiteId(), $dh, $kem_context, $secret_length
         ));
@@ -281,9 +281,9 @@ class DiffieHellmanKEM implements KemInterface
         $ephPublic = new EncapsKey($decapsKey->curve, $enc);
         $dh = $this->scalarMult($decapsKey, $ephPublic) . $this->scalarMult($decapsKey, $encapsKey);
         $kem_context = $enc .
-            $encapsKey->serializeForHeader() .
-            $decapsKey->getEncapsKey()->serializeForHeader();
-        $secret_length = $this->curve->secretLength();
+            $decapsKey->getEncapsKey()->serializeForHeader() .
+            $encapsKey->serializeForHeader();
+        $secret_length = $this->getSecretLength();
         return new SymmetricKey(
             $this->kdf->extractAndExpand($this->getSuiteId(), $dh, $kem_context, $secret_length)
         );
