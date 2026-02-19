@@ -25,15 +25,4 @@ interface KemInterface
         DecapsKeyInterface $decapsKey,
         string $enc
     ): SymmetricKeyInterface;
-
-    public function authEncaps(
-        EncapsKeyInterface $encapsKey,
-        DecapsKeyInterface $decapsKey
-    ): array;
-
-    public function authDecaps(
-        DecapsKeyInterface $decapsKey,
-        EncapsKeyInterface $encapsKey,
-        string $enc
-    ): SymmetricKeyInterface;
 }
