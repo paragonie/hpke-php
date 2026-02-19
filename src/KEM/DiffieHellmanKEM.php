@@ -246,6 +246,10 @@ class DiffieHellmanKEM implements KemInterface
      */
     protected function scalarMult(DecapsKey $decapsKey, EncapsKey $encapsKey): string
     {
+        if (hash_equals($encapsKey->bytes, $encapsKey->curve->getGeneratorBytes())) {
+            throw new HPKEException('The generator is not a valid public key');
+        }
+        // We don't need to check if the result is zero; libsodium does for us.
         return $this->curve->getEasyECC()->scalarmult(
             $decapsKey->toPrivateKey(),
             $encapsKey->toPublicKey()
