@@ -224,72 +224,6 @@ class DiffieHellmanKEM implements KemInterface
     }
 
     /**
-     * @param EncapsKey $encapsKey
-     * @param DecapsKey $decapsKey
-     * @return array{0: SymmetricKeyInterface, 1: string}
-     *
-     * @throws HPKEException
-     * @throws NotImplementedException
-     * @throws SodiumException
-     * @throws InsecureCurveException
-     */
-    public function authEncaps(EncapsKeyInterface $encapsKey, DecapsKeyInterface $decapsKey): array
-    {
-        if (is_null($this->hpke)) {
-            throw new HPKEException('HPKE not injected');
-        }
-        if (!hash_equals($encapsKey->curve->name, $this->curve->name)) {
-            throw new TypeError('Encapsulation key must be meant for this curve');
-        }
-        [$ephSecret, $ephPublic] = $this->generateKeys();
-        if (!$ephSecret instanceof DecapsKey || !$ephPublic instanceof EncapsKey) {
-            throw new TypeError('Ephemeral key pair error');
-        }
-        $dh = $this->scalarMult($ephSecret, $encapsKey) . $this->scalarMult($decapsKey, $encapsKey);
-        $enc = $ephPublic->serializeForHeader();
-        $kem_context = $enc .
-            $encapsKey->serializeForHeader() .
-            $decapsKey->getEncapsKey()->serializeForHeader();
-        $secret_length = $this->curve->secretLength();
-        $shared_secret = new SymmetricKey($this->kdf->extractAndExpand(
-            $this->getSuiteId(), $dh, $kem_context, $secret_length
-        ));
-        return [$shared_secret, $enc];
-    }
-
-    /**
-     * @param DecapsKey $decapsKey
-     * @param EncapsKey $encapsKey
-     * @param string $enc
-     * @return SymmetricKeyInterface
-     *
-     * @throws HPKEException
-     * @throws InsecureCurveException
-     * @throws SodiumException
-     */
-    public function authDecaps(
-        DecapsKeyInterface $decapsKey,
-        EncapsKeyInterface $encapsKey,
-        string $enc
-    ): SymmetricKeyInterface {
-        if (is_null($this->hpke)) {
-            throw new HPKEException('HPKE not injected');
-        }
-        if (!hash_equals($decapsKey->curve->name, $this->curve->name)) {
-            throw new TypeError('Encapsulation key must be meant for this curve');
-        }
-        $ephPublic = new EncapsKey($decapsKey->curve, $enc);
-        $dh = $this->scalarMult($decapsKey, $ephPublic) . $this->scalarMult($decapsKey, $encapsKey);
-        $kem_context = $enc .
-            $encapsKey->serializeForHeader() .
-            $decapsKey->getEncapsKey()->serializeForHeader();
-        $secret_length = $this->curve->secretLength();
-        return new SymmetricKey(
-            $this->kdf->extractAndExpand($this->getSuiteId(), $dh, $kem_context, $secret_length)
-        );
-    }
-
-    /**
      * Inject a reference to the HPKE class.
      *
      * @param HPKE $hpke
@@ -312,6 +246,10 @@ class DiffieHellmanKEM implements KemInterface
      */
     protected function scalarMult(DecapsKey $decapsKey, EncapsKey $encapsKey): string
     {
+        if (hash_equals($encapsKey->bytes, $encapsKey->curve->getGeneratorBytes())) {
+            throw new HPKEException('The generator is not a valid public key');
+        }
+        // We don't need to check if the result is zero; libsodium does for us.
         return $this->curve->getEasyECC()->scalarmult(
             $decapsKey->toPrivateKey(),
             $encapsKey->toPublicKey()

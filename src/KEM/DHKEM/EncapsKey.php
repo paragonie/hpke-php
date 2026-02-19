@@ -19,6 +19,8 @@ class EncapsKey implements EncapsKeyInterface
 {
     /**
      * @throws HPKEException
+     * @throws InsecureCurveException
+     * @throws SodiumException
      */
     public function __construct(
         public readonly Curve $curve,
@@ -27,6 +29,9 @@ class EncapsKey implements EncapsKeyInterface
     ){
         if (strlen($this->bytes) !== $this->curve->encapsKeyLength()) {
             throw new HPKEException('Invalid public key length');
+        }
+        if (hash_equals($this->curve->getGeneratorBytes(), $this->bytes)) {
+            throw new HPKEException('Encapsulation key matches the generator');
         }
     }
 
