@@ -8,8 +8,10 @@ use Mdanter\Ecc\Curves\SecureCurveFactory;
 use Mdanter\Ecc\Exception\InsecureCurveException;
 use Mdanter\Ecc\Primitives\CurveFpInterface;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
+use Mdanter\Ecc\Serializer\Point\UncompressedPointSerializer;
 use ParagonIE\EasyECC\EasyECC;
 use ParagonIE\HPKE\HPKEException;
+use SodiumException;
 
 enum Curve : string
 {
@@ -93,5 +95,23 @@ enum Curve : string
             self::NistP384 => 'P-384',
             self::NistP521 => 'P-521',
         };
+    }
+
+    /**
+     * @return string
+     * @throws HPKEException
+     * @throws InsecureCurveException
+     * @throws SodiumException
+     */
+    public function getGeneratorBytes(): string
+    {
+        if ($this === self::X25519) {
+            $generator = str_repeat("\x00", 32);
+            $generator[0] = "\x09";
+            return $generator;
+        }
+
+        $serializer = new UncompressedPointSerializer();
+        return sodium_hex2bin($serializer->serialize($this->getGenerator()));
     }
 }
