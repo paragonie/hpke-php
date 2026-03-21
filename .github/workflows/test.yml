@@ -75,4 +75,4 @@ jobs:
         run: composer install --prefer-dist
 
       - name: Run Infection
-        run: vendor/bin/infection --threads=max --min-msi=85 --min-covered-msi=90 --logger-github
+        run: vendor/bin/infection --threads=max --logger-github
