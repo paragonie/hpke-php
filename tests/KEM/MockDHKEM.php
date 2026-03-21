@@ -14,7 +14,7 @@ class MockDHKEM extends DiffieHellmanKEM
 {
     private string|PrivateKeyInterface|null $mockPrivateKey = null;
 
-    public function setPrivateKey(string|PrivateKeyInterface $mockPrivateKey = null): static
+    public function setPrivateKey(string|PrivateKeyInterface|null $mockPrivateKey = null): static
     {
         if ($this->curve === Curve::X25519) {
             if (strlen($mockPrivateKey) === 32) {

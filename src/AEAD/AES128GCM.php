@@ -47,7 +47,7 @@ class AES128GCM implements AEADInterface
             $plaintext,
             'aes-128-gcm',
             $key->bytes,
-            OPENSSL_RAW_DATA | OPENSSL_NO_PADDING,
+            OPENSSL_RAW_DATA,
             $nonce,
             $tag,
             $aad
@@ -69,7 +69,7 @@ class AES128GCM implements AEADInterface
             $ciphertext,
             'aes-128-gcm',
             $key->bytes,
-            OPENSSL_RAW_DATA | OPENSSL_NO_PADDING,
+            OPENSSL_RAW_DATA,
             $nonce,
             $tag,
             $aad

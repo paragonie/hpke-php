@@ -339,4 +339,88 @@ class HKDFTest extends TestCase
             'exporter_secret'
         );
     }
+
+    public function testExtractNullSaltUsesZeroSalt(): void
+    {
+        $hkdf = new HKDF(Hash::Sha256);
+        $ikm = 'test-input-keying-material';
+
+        $withNull = $hkdf->extract($ikm, null);
+        $withExplicitZeros = $hkdf->extract(
+            $ikm,
+            str_repeat("\0", 32)
+        );
+        $withNonZeroSalt = $hkdf->extract($ikm, 'actual-salt');
+
+        $this->assertSame(
+            bin2hex($withNull),
+            bin2hex($withExplicitZeros),
+            'null salt should equal 32-byte zero salt'
+        );
+        $this->assertNotSame(
+            bin2hex($withNull),
+            bin2hex($withNonZeroSalt),
+            'null salt should differ from non-zero salt'
+        );
+    }
+
+    public function testExpandExactBlockLength(): void
+    {
+        $hkdf = new HKDF(Hash::Sha256);
+        $prk = $hkdf->extract('ikm', 'salt');
+
+        // Request exactly 32 bytes (one SHA-256 block)
+        $result = $hkdf->expand($prk, 'info', 32);
+        $this->assertSame(32, strlen($result));
+
+        // Request 33 bytes (needs two blocks)
+        $result33 = $hkdf->expand($prk, 'info', 33);
+        $this->assertSame(33, strlen($result33));
+
+        // First 32 bytes should match
+        $this->assertSame(
+            bin2hex(substr($result33, 0, 32)),
+            bin2hex($result),
+            'First block should be identical'
+        );
+    }
+
+    public function testDeriveBytesExplicitLength(): void
+    {
+        $hkdf = new HKDF(Hash::Sha256);
+        $ikm = 'input-keying-material';
+
+        $default = $hkdf->deriveBytes($ikm);
+        $this->assertSame(32, strlen($default));
+
+        $short = $hkdf->deriveBytes($ikm, '', '', 16);
+        $this->assertSame(16, strlen($short));
+
+        $long = $hkdf->deriveBytes($ikm, '', '', 48);
+        $this->assertSame(48, strlen($long));
+
+        // The 32-byte default should match the first 32 of a 48-byte derive
+        // (they use the same underlying hash_hkdf so outputs match)
+        $explicit32 = $hkdf->deriveBytes($ikm, '', '', 32);
+        $this->assertSame(
+            bin2hex($default),
+            bin2hex($explicit32)
+        );
+    }
+
+    public static function hashLengthProvider(): array
+    {
+        return [
+            'SHA-256' => [Hash::Sha256, 32],
+            'SHA-384' => [Hash::Sha384, 48],
+            'SHA-512' => [Hash::Sha512, 64],
+        ];
+    }
+
+    #[DataProvider('hashLengthProvider')]
+    public function testGetHashLength(Hash $hash, int $expected): void
+    {
+        $hkdf = new HKDF($hash);
+        $this->assertSame($expected, $hkdf->getHashLength());
+    }
 }

@@ -1,0 +1,24 @@
+{
+    "$schema": "https://raw.githubusercontent.com/infection/infection/0.32.x/resources/schema.json",
+    "source": {
+        "directories": [
+            "src"
+        ],
+        "excludes": [
+            "Interfaces"
+        ]
+    },
+    "timeout": 60,
+    "logs": {
+        "text": "infection.log",
+        "summary": "infection-summary.log"
+    },
+    "mutators": {
+        "@default": true
+    },
+    "minMsi": 95,
+    "minCoveredMsi": 95,
+    "phpUnit": {
+        "configDir": "."
+    }
+}
