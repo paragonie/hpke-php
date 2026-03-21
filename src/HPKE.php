@@ -133,6 +133,53 @@ class HPKE
     }
 
     /**
+     * @param EncapsKeyInterface $pk
+     * @param string $psk
+     * @param string $pskID
+     * @param string $info
+     * @return array
+     *
+     * @throws HPKEException
+     */
+    public function setupPSKSender(
+        EncapsKeyInterface           $pk,
+        #[SensitiveParameter] string $psk,
+        string                       $pskID,
+        string                       $info = ''
+    ): array {
+        [$shared_secret, $enc] = $this->kem->withHPKE($this)->encapsulate($pk);
+        return [
+            $enc,
+            $this->keySchedule(Role::Sender, Mode::PSK, $shared_secret, $info, $psk, $pskID)
+        ];
+    }
+
+    /**
+     * @param DecapsKeyInterface $sk
+     * @param string $enc
+     * @param string $psk
+     * @param string $pskID
+     * @param string $info
+     * @return Receiver
+     *
+     * @throws HPKEException
+     */
+    public function setupPSKReceiver(
+        #[SensitiveParameter] DecapsKeyInterface $sk,
+        string                                   $enc,
+        #[SensitiveParameter] string             $psk,
+        string                                   $pskID,
+        string                                   $info = ''
+    ): Receiver {
+        $shared_secret = $this->kem->withHPKE($this)->decapsulate($sk, $enc);
+        $recv = $this->keySchedule(Role::Receiver, Mode::PSK, $shared_secret, $info, $psk, $pskID);
+        if (!$recv instanceof Receiver) {
+            throw new TypeError();
+        }
+        return $recv;
+    }
+
+    /**
      * @param string|SymmetricKeyInterface $ikm
      * @param string $label
      * @param ?string $salt
