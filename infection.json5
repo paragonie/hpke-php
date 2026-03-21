@@ -16,8 +16,8 @@
     "mutators": {
         "@default": true
     },
-    "minMsi": 85,
-    "minCoveredMsi": 90,
+    "minMsi": 96,
+    "minCoveredMsi": 100,
     "phpUnit": {
         "configDir": "."
     }
