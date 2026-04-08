@@ -8,28 +8,48 @@ use ParagonIE\HPKE\AEAD\{
     ChaCha20Poly1305,
     ExportOnly
 };
-use ParagonIE\HPKE\Interfaces\KDFInterface;
+use ParagonIE\HPKE\Interfaces\{
+    AEADInterface,
+    KDFInterface
+};
 use ParagonIE\HPKE\KDF\HKDF;
 use ParagonIE\HPKE\KEM\DHKEM\Curve;
 use ParagonIE\HPKE\KEM\DiffieHellmanKEM;
+use ParagonIE\HPKE\KEM\PostQuantumKEM;
+use ParagonIE\HPKE\KEM\PQKEM\Algorithm;
 
 abstract class Factory
 {
-    const PATTERN = '#^(.+?)' .
+    const DHKEM_PATTERN = '#^(.+?)' .
         '\(' .
             '([A-Za-z0-9\-]+?),' . '?\s*' . '([A-Za-z0-9\-]+?)' .
         '\)' .
         ',?' . '\s*?' . '([A-Za-z0-9\-]+?)' . ',?\s*?' . '([A-Za-z0-9\-\s]+?)' .
     '$#';
 
+    const PQKEM_PATTERN =
+        '#^(ML-KEM-768|ML-KEM-1024|X-Wing)' .
+        ',?\s*([A-Za-z0-9\-]+?)' .
+        ',?\s*([A-Za-z0-9\-\s]+?)$#';
+
     /**
      * @throws HPKEException
      */
     public static function init(string $parameterString): HPKE
     {
+        // Try PQ KEM format first: "ML-KEM-768, HKDF-SHA256, AES-128-GCM"
         $matches = [];
+        if (preg_match(self::PQKEM_PATTERN, $parameterString, $matches)) {
+            $algorithm = Algorithm::from($matches[1]);
+            $kem = new PostQuantumKEM($algorithm);
+            $outerKdf = self::getKDF($matches[2]);
+            $aead = self::getAEAD(trim($matches[3]));
+            return new HPKE($kem, $outerKdf, $aead);
+        }
+
+        // Fall back to DHKEM format: "DHKEM(X25519, HKDF-SHA256), ..."
         $matched = preg_match(
-            self::PATTERN,
+            self::DHKEM_PATTERN,
             $parameterString,
             $matches
         );
@@ -44,18 +64,7 @@ abstract class Factory
         };
 
         $outerKdf = self::getKDF($matches[4]);
-        $aead = match (trim($matches[5])) {
-            'AES-128-GCM' =>
-                new AES128GCM(),
-            'AES-256-GCM' =>
-                new AES256GCM(),
-            'ChaCha20Poly1305', 'ChaCha20-Poly1305' =>
-                new ChaCha20Poly1305(),
-            'Export-Only AEAD' =>
-                new ExportOnly(),
-            default =>
-                throw new HPKEException('Unknown AEAD mode')
-        };
+        $aead = self::getAEAD(trim($matches[5]));
         return new HPKE($kem, $outerKdf, $aead);
     }
 
@@ -69,6 +78,25 @@ abstract class Factory
             'HKDF-SHA384' => new HKDF(Hash::Sha384),
             'HKDF-SHA512' => new HKDF(Hash::Sha512),
             default => throw new HPKEException('Unknown KDF: ' . $kdfName)
+        };
+    }
+
+    /**
+     * @throws HPKEException
+     */
+    protected static function getAEAD(string $aeadName): AEADInterface
+    {
+        return match ($aeadName) {
+            'AES-128-GCM' =>
+                new AES128GCM(),
+            'AES-256-GCM' =>
+                new AES256GCM(),
+            'ChaCha20Poly1305', 'ChaCha20-Poly1305' =>
+                new ChaCha20Poly1305(),
+            'Export-Only AEAD' =>
+                new ExportOnly(),
+            default =>
+                throw new HPKEException('Unknown AEAD mode')
         };
     }
 
@@ -130,6 +158,51 @@ abstract class Factory
             new DiffieHellmanKEM(Curve::X25519, new HKDF(Hash::Sha256)),
             new HKDF(Hash::Sha256),
             new ExportOnly(),
+        );
+    }
+
+    public static function mlkem768_hkdf_sha256_aes128gcm(): HPKE
+    {
+        return new HPKE(
+            new PostQuantumKEM(Algorithm::MLKem768),
+            new HKDF(Hash::Sha256),
+            new AES128GCM(),
+        );
+    }
+
+    public static function mlkem768_hkdf_sha256_chacha20poly1305(): HPKE
+    {
+        return new HPKE(
+            new PostQuantumKEM(Algorithm::MLKem768),
+            new HKDF(Hash::Sha256),
+            new ChaCha20Poly1305(),
+        );
+    }
+
+    public static function mlkem1024_hkdf_sha256_aes256gcm(): HPKE
+    {
+        return new HPKE(
+            new PostQuantumKEM(Algorithm::MLKem1024),
+            new HKDF(Hash::Sha256),
+            new AES256GCM(),
+        );
+    }
+
+    public static function xwing_hkdf_sha256_aes128gcm(): HPKE
+    {
+        return new HPKE(
+            new PostQuantumKEM(Algorithm::XWing),
+            new HKDF(Hash::Sha256),
+            new AES128GCM(),
+        );
+    }
+
+    public static function xwing_hkdf_sha256_chacha20poly1305(): HPKE
+    {
+        return new HPKE(
+            new PostQuantumKEM(Algorithm::XWing),
+            new HKDF(Hash::Sha256),
+            new ChaCha20Poly1305(),
         );
     }
 }
