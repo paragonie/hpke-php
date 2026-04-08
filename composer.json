@@ -23,6 +23,7 @@
     "php": "^8.2",
     "ext-gmp": "*",
     "ext-openssl": "*",
+    "paragonie/pqcrypto_compat": "^0|^1",
     "paragonie/sodium_compat": "^2",
     "paragonie/easy-ecc": "^1",
     "paragonie/ecc": "^2"
