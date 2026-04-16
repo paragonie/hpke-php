@@ -13,6 +13,7 @@ use ParagonIE\HPKE\{
     HPKEException,
     Factory
 };
+use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\HPKE\KDF\HKDF;
 use ParagonIE\HPKE\KEM\PostQuantumKEM;
 use ParagonIE\HPKE\KEM\PQKEM\{
@@ -114,6 +115,18 @@ class PostQuantumKEMTest extends TestCase
         $this->assertSame(
             bin2hex($suiteId),
             bin2hex($hpke->getSuiteId())
+        );
+    }
+
+    #[DataProvider('pqkemProvider')]
+    public function testEncapsKeyMethod(HPKE $hpke, string $suiteId): void
+    {
+        [$dk, $ek] = $hpke->kem->generateKeys();
+        $ek2 = $dk->getEncapsKey();
+        $this->assertSame(
+            Base64UrlSafe::encodeUnpadded($ek->bytes),
+            Base64UrlSafe::encodeUnpadded($ek2->bytes),
+            'getEncapsKey() - ' . $suiteId
         );
     }
 
