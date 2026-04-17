@@ -26,6 +26,19 @@ that ship with [RFC 9180](https://www.rfc-editor.org/rfc/rfc9180.html#name-iana-
 * DHKEM(P-256, HKDF-SHA256), HKDF-SHA256, ChaCha20Poly1305
 * DHKEM(P-521, HKDF-SHA512), HKDF-SHA512, AES-256-GCM
 
+Additional Post-Quantum KEMs:
+
+* MLKEM768-X25519, HKDF-SHA256, AES-128-GCM
+* ML-KEM-768, HKDF-SHA256, AES-128-GCM
+* ML-KEM-1024, HKDF-SHA256, AES-256-GCM
+* MLKEM768-X25519, HKDF-SHA256, ChaCha20Poly1305
+* ML-KEM-768, HKDF-SHA256, ChaCha20Poly1305
+* ML-KEM-1024, HKDF-SHA256, ChaCha20Poly1305
+
+> [!TIP]
+> We recommend enabling opcache and JIT if you cannot install the 
+> [pqcrypto extension](https://github.com/paragonie/ext-pqcrypto).
+
 To instantiate one of these ciphersuites, you can use the Factory class, like so:
 ```php
 <?php
