@@ -28,9 +28,9 @@ abstract class Factory
     '$#';
 
     const PQKEM_PATTERN =
-        '#^(ML-KEM-768|ML-KEM-1024|X-Wing)' .
+        '#^(ML-KEM-768|ML-KEM-1024|X-Wing|mlkem768-?x25519)' .
         ',?\s*([A-Za-z0-9\-]+?)' .
-        ',?\s*([A-Za-z0-9\-\s]+?)$#';
+        ',?\s*([A-Za-z0-9\-\s]+?)$#i';
 
     /**
      * @throws HPKEException
@@ -40,7 +40,7 @@ abstract class Factory
         // Try PQ KEM format first: "ML-KEM-768, HKDF-SHA256, AES-128-GCM"
         $matches = [];
         if (preg_match(self::PQKEM_PATTERN, $parameterString, $matches)) {
-            $algorithm = Algorithm::from($matches[1]);
+            $algorithm = Algorithm::fromString($matches[1]);
             $kem = new PostQuantumKEM($algorithm);
             $outerKdf = self::getKDF($matches[2]);
             $aead = self::getAEAD(trim($matches[3]));
@@ -204,5 +204,15 @@ abstract class Factory
             new HKDF(Hash::Sha256),
             new ChaCha20Poly1305(),
         );
+    }
+
+    public static function mlkem768x25519_hkdf_sha256_aes128gcm(): HPKE
+    {
+        return static::xwing_hkdf_sha256_aes128gcm();
+    }
+
+    public static function mlkem768x25519_hkdf_sha256_chacha20poly1305(): HPKE
+    {
+        return static::xwing_hkdf_sha256_chacha20poly1305();
     }
 }

@@ -9,7 +9,20 @@ enum Algorithm: string
 {
     case MLKem768 = 'ML-KEM-768';
     case MLKem1024 = 'ML-KEM-1024';
-    case XWing = 'X-Wing';
+    /**
+     * @ref https://www.ietf.org/archive/id/draft-ietf-hpke-pq-04.html#name-hybrid-kems-with-ecdh-and-m
+     */
+    case XWing = 'MLKEM768-X25519';
+
+    public static function fromString(string $algorithmName): Algorithm
+    {
+        $normalized = strtolower($algorithmName);
+        // Use this opportunity to support aliasing:
+        return match ($normalized) {
+            'mlkem768-x25519', 'mlkem768x25519', 'x-wing', 'xwing' => Algorithm::XWing,
+            default => Algorithm::from($algorithmName),
+        };
+    }
 
     /**
      * Nenc: Ciphertext length (bytes)

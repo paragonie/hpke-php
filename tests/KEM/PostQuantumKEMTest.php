@@ -302,7 +302,7 @@ class PostQuantumKEMTest extends TestCase
                 "HPKE\x00\x42\x00\x01\x00\x02",
             ],
             [
-                'X-Wing, HKDF-SHA256, ChaCha20Poly1305',
+                'MLKEM768-X25519, HKDF-SHA256, ChaCha20Poly1305',
                 "HPKE\x64\x7a\x00\x01\x00\x03",
             ],
         ];
@@ -342,7 +342,25 @@ class PostQuantumKEMTest extends TestCase
 
         $hpke = Factory::xwing_hkdf_sha256_chacha20poly1305();
         $this->assertSame(
-            'X-Wing, HKDF-SHA256, ChaCha20Poly1305',
+            'MLKEM768-X25519, HKDF-SHA256, ChaCha20Poly1305',
+            $hpke->getSuiteName()
+        );
+
+        $hpke = Factory::xwing_hkdf_sha256_aes128gcm();
+        $this->assertSame(
+            'MLKEM768-X25519, HKDF-SHA256, AES-128-GCM',
+            $hpke->getSuiteName()
+        );
+
+        $hpke = Factory::mlkem768x25519_hkdf_sha256_chacha20poly1305();
+        $this->assertSame(
+            'MLKEM768-X25519, HKDF-SHA256, ChaCha20Poly1305',
+            $hpke->getSuiteName()
+        );
+
+        $hpke = Factory::mlkem768x25519_hkdf_sha256_aes128gcm();
+        $this->assertSame(
+            'MLKEM768-X25519, HKDF-SHA256, AES-128-GCM',
             $hpke->getSuiteName()
         );
     }
